@@ -194,6 +194,12 @@ class PushoverPlugin(octoprint.plugin.EventHandlerPlugin,
 			e1_temp = round(temps['tool0']['actual']) if 'tool0' in temps else 0
 			e1_target = temps['tool0']['target'] if 'tool0' in temps else 0
 
+			# Reset the sent flags on cooldown, so we can re-notify on the next warmup
+			if bed_target == 0:
+				self.bed_sent = False
+			if e1_target == 0:
+				self.e1_sent = False
+
 			if bed_target > 0 and bed_temp >= bed_target and self.bed_sent is False:
 				self.bed_sent = True
 
