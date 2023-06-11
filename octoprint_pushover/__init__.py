@@ -195,9 +195,10 @@ class PushoverPlugin(octoprint.plugin.EventHandlerPlugin,
 			e1_target = temps['tool0']['target'] if 'tool0' in temps else 0
 
 			# Reset the sent flags on cooldown, so we can re-notify on the next warmup
-			if bed_target == 0:
+			if bed_target == 0 and self.bed_sent is True:
+				self._logger.debug("Bed target is 0; setting bed_sent = False")
 				self.bed_sent = False
-			if e1_target == 0:
+			if e1_target == 0 and self.e1_sent is True:
 				self.e1_sent = False
 
 			if bed_target > 0 and bed_temp >= bed_target and self.bed_sent is False:
@@ -423,7 +424,7 @@ class PushoverPlugin(octoprint.plugin.EventHandlerPlugin,
 			payload = {}
 
 		# StatusNotPrinting
-		self._logger.debug("Got an event: %s, payload: %s" % (event, str(payload)))
+		# self._logger.debug("Got an event: %s, payload: %s" % (event, str(payload)))
 		# It's easier to ask forgiveness than to ask permission.
 		try:
 			# Method exists, and was used.
@@ -431,7 +432,7 @@ class PushoverPlugin(octoprint.plugin.EventHandlerPlugin,
 
 			self._logger.debug("Event triggered: %s " % str(event))
 		except AttributeError:
-			self._logger.debug("event: %s has an AttributeError %s" % (event , str(payload)))
+			# self._logger.debug("event: %s has an AttributeError %s" % (event , str(payload)))
 			# By default the message is simple and does not need any formatting
 			payload["message"] = self._settings.get(["events", event, "message"])
 
